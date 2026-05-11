@@ -22,9 +22,12 @@ jobs:
         run: pip install -r requirements.txt
 
       - name: Restore Gmail credentials
+        env:
+          GMAIL_CREDENTIALS: ${{ secrets.GMAIL_CREDENTIALS }}
+          GMAIL_TOKEN: ${{ secrets.GMAIL_TOKEN }}
         run: |
-          echo "${{ secrets.GMAIL_CREDENTIALS }}" | base64 -d > credentials.json
-          echo "${{ secrets.GMAIL_TOKEN }}" | base64 -d > token.json
+          python3 -c "import os; open('credentials.json','w').write(os.environ['GMAIL_CREDENTIALS'])"
+          python3 -c "import os; open('token.json','w').write(os.environ['GMAIL_TOKEN'])"
 
       - name: Run leads mailer
         env:
