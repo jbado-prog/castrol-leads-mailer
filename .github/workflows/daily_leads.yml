@@ -1,0 +1,41 @@
+name: Castrol Daily Leads
+
+on:
+  schedule:
+    - cron: '0 11 * * *'  # 8am Uruguay (UTC-3)
+  workflow_dispatch:       # permite correrlo manualmente desde GitHub
+
+jobs:
+  send-leads:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Restore Gmail credentials
+        run: |
+          echo "${{ secrets.GMAIL_CREDENTIALS }}" | base64 -d > credentials.json
+          echo "${{ secrets.GMAIL_TOKEN }}" | base64 -d > token.json
+
+      - name: Run leads mailer
+        env:
+          ELEVENLABS_API_KEY: ${{ secrets.ELEVENLABS_API_KEY }}
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+        run: python main.py
+
+      - name: Save processed conversations state
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add processed_conversations.json || true
+          git diff --staged --quiet || git commit -m "chore: update processed conversations"
+          git push || true

@@ -1,0 +1,8 @@
+.DS_Store
+.env
+credentials.json
+token.json
+processed_conversations.json
+logs.txt
+__pycache__/
+*.pyc
