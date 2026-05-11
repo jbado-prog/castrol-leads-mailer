@@ -26,8 +26,8 @@ jobs:
           GMAIL_CREDENTIALS: ${{ secrets.GMAIL_CREDENTIALS }}
           GMAIL_TOKEN: ${{ secrets.GMAIL_TOKEN }}
         run: |
-          python3 -c "import os,json; open('credentials.json','w').write(json.dumps(json.loads(os.environ['GMAIL_CREDENTIALS'])))"
-          python3 -c "import os,json; open('token.json','w').write(json.dumps(json.loads(os.environ['GMAIL_TOKEN'])))"
+          python3 -c "import os,base64; open('credentials.json','wb').write(base64.b64decode(os.environ['GMAIL_CREDENTIALS'].strip()))"
+          python3 -c "import os,base64; open('token.json','wb').write(base64.b64decode(os.environ['GMAIL_TOKEN'].strip()))"
 
       - name: Run leads mailer
         env:
